@@ -23,9 +23,19 @@ public class GameController : MonoBehaviour
     public GameObject snake_head;
     public string game_status;
     private float timeAfterMove;
+    private Vector3 touch_position;
+    float width = (float) Screen.width / 2.0f;
+    float height = (float) Screen.height / 2.0f;
+    //some stolen code
+    private Vector3 fp;   //First touch position
+    private Vector3 lp;   //Last touch position
+    private float dragDistance;  //minimum distance for a swipe to be registered
+    //end of stolen part
+
     // Start is called before the first frame update
     void Start()
     {
+        dragDistance = height * 5 / 100; //dragDistance is 15% height of the screen
         game_status = "menu";
         StartCoroutine(ui_controller.showStartMenu());
     }
@@ -51,13 +61,11 @@ public class GameController : MonoBehaviour
         }
         else if (game_status == "game")
         {
+            Touch touch;
+
             timeAfterMove += Time.deltaTime;
-            if (timeAfterMove >= (float)((11f - speed)/ 10f))
-            {  
-                makeMove();
-                timeAfterMove = 0f;
-            }
-            if (Input.GetKeyDown(KeyCode.D))
+            //Оставлю код для проверки в редакторе
+            /*if (Input.GetKeyDown(KeyCode.D))
             {
                 changeDirection(1);
             }
@@ -72,7 +80,63 @@ public class GameController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.S))
             {
                 changeDirection(4);
+            }*/
+
+            //another stolen code
+            UnityEngine.Debug.Log(Input.touchCount);
+            if (Input.touchCount > 0)
+            {
+                touch = Input.GetTouch(Input.touchCount-1); // get the touch
+                if (touch.phase == TouchPhase.Began) //check for the first touch
+                {
+                    fp = touch.position;
+                    lp = touch.position;
+                }
+                else if (touch.phase == TouchPhase.Moved) // update the last position based on where they moved
+                {
+                    lp = touch.position;
+                }
+                else if (touch.phase == TouchPhase.Ended) //check if the finger is removed from the screen
+                {
+                    lp = touch.position;  //last touch position. Ommitted if you use list
+
+                    //Check if drag distance is greater than 20% of the screen height
+                    if (Mathf.Abs(lp.x - fp.x) > dragDistance || Mathf.Abs(lp.y - fp.y) > dragDistance)
+                    {//It's a drag
+                     //check if the drag is vertical or horizontal
+                        if (Mathf.Abs(lp.x - fp.x) > Mathf.Abs(lp.y - fp.y))
+                        {   //If the horizontal movement is greater than the vertical movement...
+                            if ((lp.x > fp.x))  //If the movement was to the right)
+                            {   //Right swipe
+                                changeDirection(1);
+                            }
+                            else
+                            {   //Left swipe
+                                changeDirection(2);
+                            }
+                        }
+                        else
+                        {   //the vertical movement is greater than the horizontal movement
+                            if (lp.y > fp.y)  //If the movement was up
+                            {   //Up swipe
+                                changeDirection(3);
+                            }
+                            else
+                            {   //Down swipe
+                                changeDirection(4);
+                            }
+                        }
+                    }
+                }
             }
+
+                //end of stolen part
+            if (timeAfterMove >= (float)((11f - speed)/ 10f))
+            {  
+                makeMove();
+                timeAfterMove = 0f;
+            }
+            
         }
     }
     private int[][] createSnake() {
@@ -317,7 +381,7 @@ public class GameController : MonoBehaviour
         if (orthographicSize != cam.orthographicSize)
             cam.orthographicSize = orthographicSize;
     
-        float stepFromLeft = (cam.pixelWidth - cam.pixelHeight) / 2;
+        float stepFromLeft = (width - height) / 2;
         float helpingStep = (float)world_size / 2;
         black.GetComponent<BoxCollider2D>().size = new Vector2(cam.pixelHeight / world_size, cam.pixelHeight/ world_size) ;
         float step = cam.pixelHeight / world_size;

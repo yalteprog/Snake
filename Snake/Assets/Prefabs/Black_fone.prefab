@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 8448167796318611026}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -56730, y: 15057, z: -67}
-  m_LocalScale: {x: 0.82, y: 0.82, z: 0}
+  m_LocalScale: {x: 1.04, y: 1.04, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -105,5 +105,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 41, y: 41}
+  m_Size: {x: 52, y: 52}
   m_EdgeRadius: 0
